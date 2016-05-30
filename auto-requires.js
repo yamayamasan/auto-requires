@@ -4,40 +4,40 @@ const util = require('util');
 const fs = require('fs');
 const _ = require('lodash');
 
-const AutoRequire = function (options) {
-  if (!(this instanceof AutoRequire)) {
-    return new AutoRequire(options);
+const AutoRequires = function (options) {
+  if (!(this instanceof AutoRequires)) {
+    return new AutoRequires(options);
   }
+
+  if (!options.root || !options.path) throw new Error('Required args [root, path]');
 
   const self = this;
 
-  this.mods = {};
-  this.options = options || {
-    root: '',
-    path: 'ctrl',
-    jointype: 'under',
-    isNest: false
-  };
-
-
+  if (util.isString(options.path)) options.path = [options.path];
+  this.modules = {};
   this.filelist = [];
   this.dirs = [];
-  if (util.isString(this.options.path)) this.options.path = [this.options.path];
+  this.options = _.merge({
+    root: '',
+    path: '',
+    jointype: 'under',
+    isNest: false
+  }, options);
+
   this.options.path.forEach((v) => {
-    let path = `${options.root}/${v}`;
-    set(path);
+    set(`${options.root}/${v}`);
   });
+
   const list = getList();
 
-  let modmod = {};
   list.forEach((v) => {
     const f = v.replace(/\_/g, '/');
     const file = `${this.options.root}/${f}`;
     if (this.options.jointype == 'object') {
       const s = v.split('_');
-      _.set(this.mods, s, require(file));
+      _.set(this.modules, s, require(file));
      } else {
-      this.mods[v] = require(file);
+      this.modules[v] = require(file);
      }
   });
 
@@ -60,12 +60,6 @@ const AutoRequire = function (options) {
     self.filelist.push(key);
   }
 
-  function join(path, dir) {
-    let o = {};
-    o[dir] = path;
-    return o;
-  }
-
   function getList () {
     return self.filelist;
   }
@@ -77,6 +71,8 @@ const AutoRequire = function (options) {
   function isDir (path) {
     return fs.existsSync(path) && fs.statSync(path).isDirectory();
   }
+
+  return this.modules;
 };
 
-module.exports = AutoRequire;
+module.exports = AutoRequires;

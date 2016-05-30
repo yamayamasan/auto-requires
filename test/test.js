@@ -7,7 +7,7 @@ describe("Test", function () {
     var mods = autorequire({
       root: __dirname + '/app',
       path: 'ctrl'
-    }).mods;
+    });
 
     var ctrlindex = mods.ctrl_index.index();
     expect(mods).to.have.all.keys('ctrl_index', 'ctrl_user');
@@ -18,7 +18,7 @@ describe("Test", function () {
     var multi = autorequire({
       root: __dirname + '/app',
       path: ['ctrl', 'model', 'lib'],
-    }).mods;
+    });
 
     var ctrlindex = multi.ctrl_index.index();
     expect(multi).to.have.all.keys('ctrl_index', 'ctrl_user', 'model_index', 'lib_index');
@@ -30,10 +30,31 @@ describe("Test", function () {
       root: __dirname + '/app',
       path: ['ctrl'],
       jointype: 'object'
-    }).mods.ctrl;
+    }).ctrl;
 
     var ctrlindex = multi.index.index();
     expect(multi).to.have.all.keys('index', 'user');
     expect(ctrlindex).to.equal('ctrl.index.index');
+  });
+
+  it ("require params", function () {
+    try {
+      var nonRoot = autorequire({
+        path: ['ctrl'],
+        jointype: 'object'
+      });
+    } catch (e) {
+      expect(e).to.eql(new Error());
+    }
+
+    try {
+      var nonPath = autorequire({
+        root: __dirname + '/app',
+        jointype: 'object'
+      });
+    } catch(e) {
+      expect(e).to.eql(new Error());
+    }
+
   });
 });
