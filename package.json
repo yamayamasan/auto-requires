@@ -1,0 +1,21 @@
+{
+  "name": "auto-requires",
+  "version": "0.0.1",
+  "description": "auto require module",
+  "main": "auto-requires.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "moche test/test.js"
+  },
+  "author": "yamayamasan",
+  "license": "GPL",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^2.5.3"
+  },
+  "dependencies": {
+    "lodash": "^4.13.1"
+  }
+}
