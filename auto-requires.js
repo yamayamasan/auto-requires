@@ -28,19 +28,6 @@ const AutoRequires = function (options) {
     set(`${options.root}/${v}`);
   });
 
-  const list = getList();
-
-  list.forEach((v) => {
-    const f = v.replace(/\_/g, '/');
-    const file = `${this.options.root}/${f}`;
-    if (this.options.jointype == 'object') {
-      const s = v.split('_');
-      _.set(this.modules, s, require(file));
-     } else {
-      this.modules[v] = require(file);
-     }
-  });
-
   function set (path, isNest) {
     const flist = fs.readdirSync(path);
     let key = null;
@@ -49,19 +36,21 @@ const AutoRequires = function (options) {
 
     flist.forEach((f) => {
       if (isDir(f)) set(`${path}/${f}`, true);
-      setFileList(f, key);
+      setModule(f, key);
     });
   }
 
-  function setFileList(path, dir) {
+  function setModule(path, dir) {
     if (!path.match(/.*\.js$/)) return;
     let key = getVarName(path);
-    if (dir !== null) key = `${dir}_${key}`;
-    self.filelist.push(key);
-  }
 
-  function getList () {
-    return self.filelist;
+    const file = `${self.options.root}/${dir}/${key}`;
+    if (self.options.jointype == 'object') {
+      _.set(self.modules, [dir, key], require(file));
+     } else {
+      key = `${dir}_${key}`;
+      self.modules[key] = require(file);
+     }
   }
 
   function getVarName (f) {
