@@ -10,7 +10,7 @@ describe("Test", function () {
     });
 
     var ctrlindex = mods.ctrl_index.index();
-    expect(mods).to.have.all.keys('ctrl_index', 'ctrl_user');
+    expect(mods).to.have.all.keys('ctrl_index', 'ctrl_user', 'ctrl_data_list');
     expect(ctrlindex).to.equal('ctrl.index.index');
   });
 
@@ -21,7 +21,7 @@ describe("Test", function () {
     });
 
     var ctrlindex = multi.ctrl_index.index();
-    expect(multi).to.have.all.keys('ctrl_index', 'ctrl_user', 'model_index', 'lib_index');
+    expect(multi).to.have.all.keys('ctrl_index', 'ctrl_user', 'model_index', 'lib_index', 'ctrl_data_list');
     expect(ctrlindex).to.equal('ctrl.index.index');
   });
 
@@ -33,7 +33,7 @@ describe("Test", function () {
     }).ctrl;
 
     var ctrlindex = multi.index.index();
-    expect(multi).to.have.all.keys('index', 'user');
+    expect(multi).to.have.all.keys('index', 'user', 'data_list');
     expect(ctrlindex).to.equal('ctrl.index.index');
   });
 
@@ -55,6 +55,18 @@ describe("Test", function () {
     } catch(e) {
       expect(e).to.eql(new Error());
     }
+  });
 
+  it ("test nest", function () {
+    var multi = autorequire({
+      root: __dirname + '/app',
+      path: ['ctrl'],
+      jointype: 'object',
+      isNest: true
+    }).ctrl;
+
+    var ctrlindex = multi.index.index();
+    expect(multi).to.have.all.keys('index', 'user', 'data_list', 'admin', 'sub');
+    expect(ctrlindex).to.equal('ctrl.index.index');
   });
 });

@@ -9,33 +9,34 @@ const AutoRequires = function (options) {
     return new AutoRequires(options);
   }
 
-  if (!options.root || !options.path) throw new Error('Required args [root, path]');
-
-  const self = this;
+  if (!options.root || !options.path) {
+    throw new Error('Required args [root, path]');
+  }
 
   if (util.isString(options.path)) options.path = [options.path];
   this.modules = {};
   this.filelist = [];
   this.dirs = [];
-  this.options = _.merge({
+  this.options = Object.assign({
     root: '',
     path: '',
     jointype: 'under',
     isNest: false
   }, options);
 
-  this.options.path.forEach((v) => {
+  const self = this;
+
+  self.options.path.forEach((v) => {
     set(`${options.root}/${v}`);
   });
 
-  function set (path, isNest) {
+  function set (path) {
     const flist = fs.readdirSync(path);
-    let key = null;
-    if (isNest) key = path.replace(self.options.root, '').replace(/^\//g,'');
-    key = path.replace(self.options.root, '').replace(/^\//g,'');
+    const key = path.replace(self.options.root, '').replace(/^\//g,'');
 
     flist.forEach((f) => {
-      if (isDir(f)) set(`${path}/${f}`, true);
+      const pf = `${path}/${f}`;
+      if (self.options.isNest && isDir(pf)) set(pf);
       setModule(f, key);
     });
   }
@@ -46,11 +47,14 @@ const AutoRequires = function (options) {
 
     const file = `${self.options.root}/${dir}/${key}`;
     if (self.options.jointype == 'object') {
-      _.set(self.modules, [dir, key], require(file));
-     } else {
+      const targetArr = dir.split('/');
+      targetArr.push(key);
+      _.set(self.modules, targetArr, require(file));
+    } else {
+      dir = dir.replace('/', '_');
       key = `${dir}_${key}`;
       self.modules[key] = require(file);
-     }
+    }
   }
 
   function getVarName (f) {
@@ -61,7 +65,7 @@ const AutoRequires = function (options) {
     return fs.existsSync(path) && fs.statSync(path).isDirectory();
   }
 
-  return this.modules;
+  return self.modules;
 };
 
 module.exports = AutoRequires;
