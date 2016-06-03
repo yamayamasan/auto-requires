@@ -30,14 +30,13 @@ const AutoRequires = function (options) {
     set(`${options.root}/${v}`);
   });
 
-  function set (path, isNest) {
+  function set (path) {
     const flist = fs.readdirSync(path);
-    let key = null;
-    key = path.replace(self.options.root, '').replace(/^\//g,'');
+    const key = path.replace(self.options.root, '').replace(/^\//g,'');
 
     flist.forEach((f) => {
       const pf = `${path}/${f}`;
-      if (self.options.isNest && isDir(pf)) set(pf, true);
+      if (self.options.isNest && isDir(pf)) set(pf);
       setModule(f, key);
     });
   }
